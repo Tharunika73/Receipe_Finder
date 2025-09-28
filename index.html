@@ -287,7 +287,7 @@ function loadInfo(){
   if(info){ displayInfo(info); }
 }
 
-// DISPLAY INFO (single edit option)
+// DISPLAY INFO
 function displayInfo(info){
   const box = document.getElementById("personalInfo");
   box.classList.remove("hidden");
@@ -311,7 +311,7 @@ function displayInfo(info){
   `;
 }
 
-// EDIT PROFILE (show form with pre-filled values)
+// EDIT PROFILE
 function editProfile(){
   const info = JSON.parse(localStorage.getItem("profileInfo")) || {};
   document.getElementById("fullname").value = info.name || "";
@@ -325,7 +325,7 @@ function editProfile(){
   document.getElementById("personalForm").classList.remove("hidden");
 }
 
-// SEARCH RECIPES (show all related)
+// SEARCH RECIPES
 async function searchRecipes(){
   const ingredients = document.getElementById("ingredients").value.trim();
   if(!ingredients){ alert("Enter ingredients"); return; }
@@ -339,11 +339,11 @@ async function searchRecipes(){
     const data = await res.json();
     renderResults(data, "results");
   } catch(err){
-    document.getElementById("results").innerHTML = "<p style='color:red'>Error fetching recipes.</p>";
+    document.getElementById("results").innerHTML = "";
   }
 }
 
-// RECOMMENDATIONS (4 tiles)
+// RECOMMENDATIONS
 async function loadRecommendations(){
   const url = `https://api.spoonacular.com/recipes/random?number=4&apiKey=${API_KEY}`;
   try {
@@ -351,11 +351,11 @@ async function loadRecommendations(){
     const data = await res.json();
     renderResults(data.recipes, "recommendations");
   } catch(err){
-    document.getElementById("recommendations").innerHTML = "<p style='color:red'>Error loading recommendations.</p>";
+    document.getElementById("recommendations").innerHTML = ""; 
   }
 }
 
-// TRENDING RECIPES
+// TRENDING
 async function loadTrending(){
   const url = `https://api.spoonacular.com/recipes/random?number=6&tags=popular&apiKey=${API_KEY}`;
   try {
@@ -363,7 +363,7 @@ async function loadTrending(){
     const data = await res.json();
     renderResults(data.recipes, "trending");
   } catch(err){
-    document.getElementById("trending").innerHTML = "<p style='color:red'>Error loading trending recipes.</p>";
+    document.getElementById("trending").innerHTML = ""; 
   }
 }
 
@@ -371,7 +371,7 @@ async function loadTrending(){
 function renderResults(recipes, targetId){
   const results = document.getElementById(targetId);
   results.innerHTML = "";
-  if(!recipes.length){ results.innerHTML = "<p>No recipes found</p>"; return; }
+  if(!recipes || !recipes.length){ return; }
 
   recipes.forEach(r => {
     const card = document.createElement("div");
@@ -409,7 +409,7 @@ async function getRecipeDetails(id){
       <button onclick="closeDetails()">Close</button>
     `;
   } catch(err){
-    card.innerHTML = "<p style='color:red'>Error loading details.</p>";
+    card.innerHTML = "<p>No details available.</p>";
   }
 }
 
