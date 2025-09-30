@@ -2,426 +2,215 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>🍳 Recipe Finder</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background:#f7f9fc;
-      color:#2f3e3c;
-      text-align:center;
+    :root {
+      --brand:#006d77;
+      --bg:#f7f9fc;
+      --text:#2f3e3c;
+      --muted:#6b7a78;
+      --card-bg:#fff;
+      --border:#e0e5eb;
     }
-    header {
-      background:#1A3636;
-      color:white;
-      padding:15px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-    header h1 { margin:0; font-size:22px; }
-    nav button {
-      background:white;
-      color:#1A3636;
-      border:none;
-      margin-left:10px;
-      padding:8px 16px;
-      border-radius:6px;
-      cursor:pointer;
-      font-weight:600;
-      transition:0.2s;
-    }
-    nav button:hover { background:#d0dbd8; }
-
-    .container { padding:20px; max-width:1100px; margin:auto; }
-
-    input, select, button {
-      padding:10px;
-      border-radius:6px;
-      border:1px solid #ccc;
-      font-size:14px;
-    }
-    button {
-      background:#1A3636;
-      color:white;
-      font-weight:bold;
-      cursor:pointer;
-      border:none;
-    }
-    button:hover { background:#2d4d4d; }
-
-    /* Center Search Section */
-    #searchSection {
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:10px;
-      margin-top:20px;
-    }
-    #searchSection input { width:300px; }
-
-    .results {
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
-      gap:15px;
-      margin-top:20px;
-    }
-    .card {
-      background:white;
-      border-radius:12px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.08);
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      transition:transform 0.3s ease, box-shadow 0.3s ease;
-      animation:fadeIn 0.6s ease;
-    }
-    .card:hover {
-      transform:translateY(-6px);
-      box-shadow:0 6px 16px rgba(0,0,0,0.15);
-    }
-    .card img {
-      width:100%;
-      height:160px;
-      object-fit:cover;
-    }
-    .card h3 { margin:10px; font-size:18px; color:#333; }
-    .card p { margin:0 10px 10px; font-size:14px; color:#555; }
-    .card button {
-      margin:10px;
-      background:#1A3636;
-      color:white;
-      border-radius:6px;
-    }
-    .card button:hover { background:#2d4d4d; }
-
-    #detailsOverlay {
-      display:none;
-      position:fixed;
-      top:0; left:0;
-      width:100%; height:100%;
-      background:rgba(0,0,0,0.6);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:10;
-    }
-    #detailsCard {
-      background:white;
-      padding:20px;
-      border-radius:12px;
-      width:500px;
-      max-height:90vh;
-      overflow:auto;
-      box-shadow:0 4px 12px rgba(0,0,0,0.2);
-      animation:fadeIn 0.5s ease;
-    }
-    #detailsCard img { max-width:100%; border-radius:10px; }
-
-    /* Profile Page Styling */
-    .profile-container {
-      max-width:600px;
-      margin:30px auto;
-      background:white;
-      border-radius:12px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.1);
-      padding:30px;
-      text-align:left;
-      animation:fadeIn 0.6s ease;
-    }
-    .profile-header {
-      display:flex;
-      align-items:center;
-      gap:20px;
-    }
-    .profile-header img {
-      width:90px;
-      height:90px;
-      border-radius:50%;
-      object-fit:cover;
-      border:3px solid #1A3636;
-    }
-    .profile-info {
-      margin-top:20px;
-    }
-    .profile-info p {
-      margin:8px 0;
-      font-size:15px;
-    }
-    .edit-btn {
-      margin-top:20px;
-      display:block;
-      padding:10px 20px;
-      border-radius:6px;
-      font-weight:600;
-      background:#1A3636;
-      color:white;
-    }
-    .edit-btn:hover {
-      background:#2d4d4d;
-    }
-    .hidden { display:none; }
-
-    @keyframes fadeIn {
-      from { opacity:0; transform:translateY(10px); }
-      to { opacity:1; transform:translateY(0); }
-    }
+    body { font-family: 'Segoe UI', sans-serif; margin:0; background:var(--bg); color:var(--text); }
+    header { background:var(--brand); color:white; padding:10px 16px; text-align:center; font-size:20px; }
+    nav.top-nav { display:flex; gap:15px; justify-content:center; margin:10px 0; }
+    nav.top-nav a { text-decoration:none; color:var(--brand); font-weight:500; }
+    nav.top-nav a.active { border-bottom:2px solid var(--brand); }
+    .page { display:none; padding:20px; max-width:900px; margin:auto; }
+    .page.active { display:block; }
+    .search-bar { display:flex; gap:10px; margin:20px 0; }
+    .search-bar input { flex:1; padding:10px; border:1px solid var(--border); border-radius:6px; }
+    .btn { padding:10px 16px; border:none; border-radius:6px; cursor:pointer; background:var(--brand); color:white; font-weight:500; }
+    .btn.ghost { background:#e0f2f1; color:var(--brand); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+    .card { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05); cursor:pointer; transition:transform .15s; }
+    .card:hover { transform:translateY(-2px); }
+    .card img { width:100%; height:140px; object-fit:cover; border-radius:8px; }
+    .card h4 { margin:8px 0; font-size:16px; }
+    .chips { margin-top:6px; display:flex; flex-wrap:wrap; gap:4px; }
+    .chip { background:#e0f2f1; padding:2px 6px; border-radius:4px; font-size:12px; color:var(--brand); }
+    .meta { font-size:13px; color:var(--muted); margin-top:6px; display:flex; justify-content:space-between; align-items:center; }
+    .details img { width:100%; max-height:300px; object-fit:cover; border-radius:12px; margin-bottom:15px; }
+    .panel { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:20px; margin:10px 0; }
+    .avatar { width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:bold; color:white; margin-bottom:10px; }
+    .profile-field { margin:8px 0; }
+    .small-btn { font-size:12px; padding:4px 10px; border-radius:4px; border:1px solid var(--brand); background:white; color:var(--brand); cursor:pointer; }
   </style>
 </head>
 <body>
-
-<header>
-  <h1>🍳 Recipe Finder</h1>
-  <nav>
-    <button onclick="showHome()">Home</button>
-    <button onclick="showProfile()">Profile</button>
+  <header>🍳 Recipe Finder</header>
+  <nav class="top-nav">
+    <a href="#" id="navHome" class="active">Home</a>
+    <a href="#" id="navProfile">Profile</a>
+    <a href="#" id="navSign">Sign In</a>
   </nav>
-</header>
 
-<!-- HOME PAGE -->
-<div id="homePage" class="container">
-  <h2>Find Recipes by Ingredients</h2>
-  <div id="searchSection">
-    <input type="text" id="ingredients" placeholder="e.g. chicken, tomato, onion">
-    <button onclick="searchRecipes()">Search</button>
+  <!-- Sign in -->
+  <div class="page" id="signPage">
+    <div class="panel">
+      <h2>Sign In</h2>
+      <input id="signinName" placeholder="Your name" style="width:100%;padding:10px;margin:6px 0"/>
+      <input id="signinEmail" placeholder="Your email" style="width:100%;padding:10px;margin:6px 0"/>
+      <button id="btnSignIn" class="btn" style="width:100%;margin-top:10px">Sign In</button>
+      <button id="btnGuest" class="btn ghost" style="width:100%;margin-top:10px">Continue as Guest</button>
+      <button id="btnViewSample" class="btn ghost" style="width:100%;margin-top:10px">View Sample</button>
+    </div>
   </div>
 
-  <h2>Recommended Recipes</h2>
-  <div id="recommendations" class="results"></div>
-
-  <h2>Search Results</h2>
-  <div id="results" class="results"></div>
-
-  <h2>🔥 Trending Recipes</h2>
-  <div id="trending" class="results"></div>
-</div>
-
-<!-- Recipe Details Modal -->
-<div id="detailsOverlay" onclick="closeDetails(event)">
-  <div id="detailsCard"></div>
-</div>
-
-<!-- PROFILE PAGE -->
-<div id="profilePage" class="container hidden">
-  <h2>👤 Your Profile</h2>
-
-  <!-- Auth Section -->
-  <div class="profile-container" id="authBox">
-    <h3>Sign In / Sign Up</h3>
-    <input type="text" id="username" placeholder="Username"><br><br>
-    <input type="password" id="password" placeholder="Password"><br><br>
-    <button onclick="signIn()">Sign In</button>
+  <!-- Home -->
+  <div class="page active" id="homePage">
+    <h2 id="welcomeText">Hello, Guest</h2>
+    <div class="search-bar">
+      <input id="searchInput" placeholder="Search recipes by ingredients..."/>
+      <button id="searchBtn" class="btn">Search</button>
+      <button id="clearBtn" class="btn ghost">Clear</button>
+    </div>
+    <h3>Recommended Recipes</h3>
+    <div class="grid" id="recommendedGrid"></div>
+    <h3>Search Results</h3>
+    <div class="grid" id="resultGrid"></div>
   </div>
 
-  <!-- Profile Info -->
-  <div class="hidden" id="infoBox">
-    <div id="personalForm" class="profile-container hidden">
-      <h3>Edit Your Profile</h3>
-      <input type="text" id="fullname" placeholder="Full Name"><br><br>
-      <input type="email" id="email" placeholder="Email"><br><br>
-      <input type="number" id="age" placeholder="Age"><br><br>
-      <select id="gender">
-        <option value="">Select Gender</option>
-        <option>Male</option>
-        <option>Female</option>
-        <option>Other</option>
-      </select><br><br>
-      <input type="text" id="diet" placeholder="Diet Preference (e.g. Vegan)"><br><br>
-      <input type="text" id="cuisine" placeholder="Favorite Cuisine"><br><br>
-      <input type="text" id="allergies" placeholder="Allergies (comma separated)"><br><br>
-      <button onclick="saveInfo()">Save Info</button>
-    </div>
-
-    <!-- Profile Display -->
-    <div id="personalInfo" class="profile-container"></div>
-  </div>
-</div>
-
-<script>
-const API_KEY = "849bee6e6b3346288f761d8bd9930aa9"; 
-
-// NAVIGATION
-function showHome(){
-  document.getElementById("homePage").classList.remove("hidden");
-  document.getElementById("profilePage").classList.add("hidden");
-}
-function showProfile(){
-  document.getElementById("profilePage").classList.remove("hidden");
-  document.getElementById("homePage").classList.add("hidden");
-}
-
-// SIGN IN
-function signIn(){
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
-  if(user && pass){
-    localStorage.setItem("user", user);
-    document.getElementById("authBox").classList.add("hidden");
-    document.getElementById("infoBox").classList.remove("hidden");
-    loadInfo();
-  } else {
-    alert("Enter username and password!");
-  }
-}
-
-// SAVE PERSONAL INFO
-function saveInfo(){
-  const info = {
-    name: document.getElementById("fullname").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    age: document.getElementById("age").value.trim(),
-    gender: document.getElementById("gender").value,
-    diet: document.getElementById("diet").value.trim(),
-    cuisine: document.getElementById("cuisine").value.trim(),
-    allergies: document.getElementById("allergies").value.trim()
-  };
-  if(!info.name || !info.email){ alert("Fill in required fields"); return; }
-  localStorage.setItem("profileInfo", JSON.stringify(info));
-  displayInfo(info);
-  document.getElementById("personalForm").classList.add("hidden");
-}
-
-// LOAD INFO
-function loadInfo(){
-  const info = JSON.parse(localStorage.getItem("profileInfo"));
-  if(info){ displayInfo(info); }
-}
-
-// DISPLAY INFO
-function displayInfo(info){
-  const box = document.getElementById("personalInfo");
-  box.classList.remove("hidden");
-
-  box.innerHTML = `
-    <div class="profile-header">
-      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile">
-      <div>
-        <h2>${info.name || "Your Name"}</h2>
-        <p>${info.email || ""}</p>
-      </div>
-    </div>
-    <div class="profile-info">
-      <p><b>Age:</b> ${info.age || "N/A"}</p>
-      <p><b>Gender:</b> ${info.gender || "N/A"}</p>
-      <p><b>Diet:</b> ${info.diet || "N/A"}</p>
-      <p><b>Favorite Cuisine:</b> ${info.cuisine || "N/A"}</p>
-      <p><b>Allergies:</b> ${info.allergies || "N/A"}</p>
-    </div>
-    <button class="edit-btn" onclick="editProfile()">✏️ Edit Profile</button>
-  `;
-}
-
-// EDIT PROFILE
-function editProfile(){
-  const info = JSON.parse(localStorage.getItem("profileInfo")) || {};
-  document.getElementById("fullname").value = info.name || "";
-  document.getElementById("email").value = info.email || "";
-  document.getElementById("age").value = info.age || "";
-  document.getElementById("gender").value = info.gender || "";
-  document.getElementById("diet").value = info.diet || "";
-  document.getElementById("cuisine").value = info.cuisine || "";
-  document.getElementById("allergies").value = info.allergies || "";
-
-  document.getElementById("personalForm").classList.remove("hidden");
-}
-
-// SEARCH RECIPES
-async function searchRecipes(){
-  const ingredients = document.getElementById("ingredients").value.trim();
-  if(!ingredients){ alert("Enter ingredients"); return; }
-
-  const url = `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${encodeURIComponent(ingredients)}&number=12&apiKey=${API_KEY}`;
-
-  document.getElementById("results").innerHTML = "<p>Loading...</p>";
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    renderResults(data, "results");
-  } catch(err){
-    document.getElementById("results").innerHTML = "";
-  }
-}
-
-// RECOMMENDATIONS
-async function loadRecommendations(){
-  const url = `https://api.spoonacular.com/recipes/random?number=4&apiKey=${API_KEY}`;
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    renderResults(data.recipes, "recommendations");
-  } catch(err){
-    document.getElementById("recommendations").innerHTML = ""; 
-  }
-}
-
-// TRENDING
-async function loadTrending(){
-  const url = `https://api.spoonacular.com/recipes/random?number=6&tags=popular&apiKey=${API_KEY}`;
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    renderResults(data.recipes, "trending");
-  } catch(err){
-    document.getElementById("trending").innerHTML = ""; 
-  }
-}
-
-// RENDER RESULTS
-function renderResults(recipes, targetId){
-  const results = document.getElementById(targetId);
-  results.innerHTML = "";
-  if(!recipes || !recipes.length){ return; }
-
-  recipes.forEach(r => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <img src="${r.image}" alt="${r.title}">
-      <h3>${r.title}</h3>
-      <button onclick="getRecipeDetails(${r.id})">View Details</button>
-    `;
-    results.appendChild(card);
-  });
-}
-
-// GET RECIPE DETAILS
-async function getRecipeDetails(id){
-  const url = `https://api.spoonacular.com/recipes/${id}/information?includeNutrition=false&apiKey=${API_KEY}`;
-  const overlay = document.getElementById("detailsOverlay");
-  const card = document.getElementById("detailsCard");
-  card.innerHTML = "<p>Loading...</p>";
-  overlay.style.display = "flex";
-
-  try {
-    const res = await fetch(url);
-    const recipe = await res.json();
-    let ingredientsList = recipe.extendedIngredients.map(i => `<li>${i.original}</li>`).join("");
-    card.innerHTML = `
-      <h2>${recipe.title}</h2>
-      <img src="${recipe.image}">
-      <p><b>Ready in:</b> ${recipe.readyInMinutes} mins</p>
-      <p><b>Servings:</b> ${recipe.servings}</p>
+  <!-- Details -->
+  <div class="page" id="detailsPage">
+    <button id="backToHome" class="btn ghost">← Back</button>
+    <div class="details">
+      <img id="detailsImage"/>
+      <h2 id="detailsTitle"></h2>
+      <div id="detailTags" class="chips"></div>
       <h3>Ingredients</h3>
-      <ul>${ingredientsList}</ul>
+      <ul id="detailsIngredients"></ul>
       <h3>Instructions</h3>
-      <p>${recipe.instructions || "No instructions provided."}</p>
-      <button onclick="closeDetails()">Close</button>
-    `;
-  } catch(err){
-    card.innerHTML = "<p>No details available.</p>";
-  }
-}
+      <div id="detailsInstructions"></div>
+    </div>
+  </div>
 
-// CLOSE DETAILS
-function closeDetails(e){
-  if(e && e.target.id !== "detailsOverlay" && e.target.tagName !== "BUTTON") return;
-  document.getElementById("detailsOverlay").style.display = "none";
-}
+  <!-- Profile -->
+  <div class="page" id="profilePage">
+    <div class="panel" style="text-align:center">
+      <div class="avatar" id="profileAvatar">U</div>
+      <h3 id="profileName">Guest</h3>
+      <p id="profileEmail">Not signed in</p>
+      <button id="editProfileBtn" class="small-btn">Edit Profile</button>
+      <button id="btnSignOut" class="small-btn">Sign Out</button>
+    </div>
+    <div id="editProfilePanel" class="panel" style="display:none">
+      <h3>Edit Profile</h3>
+      <input id="profileNameInput" placeholder="Name" style="width:100%;padding:10px;margin:6px 0"/>
+      <input id="profileEmailInput" placeholder="Email" style="width:100%;padding:10px;margin:6px 0"/>
+      <button id="saveProfileBtn" class="btn" style="margin-top:10px">Save</button>
+      <button id="cancelEditBtn" class="btn ghost" style="margin-top:10px">Cancel</button>
+    </div>
+  </div>
 
-// Load recommendations + trending on startup
-loadRecommendations();
-loadTrending();
-</script>
+  <!-- Script -->
+  <script>
+    const API_KEY = "849bee6e6b3346288f761d8bd9930aa9"; // Replace with your key
+    const API_BASE = "https://api.spoonacular.com/recipes";
+
+    // DOM references
+    const navHome=document.getElementById('navHome'),
+          navProfile=document.getElementById('navProfile'),
+          navSign=document.getElementById('navSign'),
+          signPage=document.getElementById('signPage'),
+          homePage=document.getElementById('homePage'),
+          detailsPage=document.getElementById('detailsPage'),
+          profilePage=document.getElementById('profilePage'),
+          searchInput=document.getElementById('searchInput'),
+          searchBtn=document.getElementById('searchBtn'),
+          clearBtn=document.getElementById('clearBtn'),
+          recommendedGrid=document.getElementById('recommendedGrid'),
+          resultGrid=document.getElementById('resultGrid'),
+          welcomeText=document.getElementById('welcomeText'),
+          signinName=document.getElementById('signinName'),
+          signinEmail=document.getElementById('signinEmail'),
+          btnSignIn=document.getElementById('btnSignIn'),
+          btnGuest=document.getElementById('btnGuest'),
+          btnViewSample=document.getElementById('btnViewSample'),
+          detailsImage=document.getElementById('detailsImage'),
+          detailsTitle=document.getElementById('detailsTitle'),
+          detailsIngredients=document.getElementById('detailsIngredients'),
+          detailsInstructions=document.getElementById('detailsInstructions'),
+          detailTags=document.getElementById('detailTags'),
+          backToHome=document.getElementById('backToHome'),
+          profileAvatar=document.getElementById('profileAvatar'),
+          profileName=document.getElementById('profileName'),
+          profileEmail=document.getElementById('profileEmail'),
+          editProfileBtn=document.getElementById('editProfileBtn'),
+          editProfilePanel=document.getElementById('editProfilePanel'),
+          profileNameInput=document.getElementById('profileNameInput'),
+          profileEmailInput=document.getElementById('profileEmailInput'),
+          saveProfileBtn=document.getElementById('saveProfileBtn'),
+          cancelEditBtn=document.getElementById('cancelEditBtn'),
+          btnSignOut=document.getElementById('btnSignOut');
+
+    const STORAGE_KEY='rf_profile_v1';
+    const loadProfile=()=>{try{return JSON.parse(localStorage.getItem(STORAGE_KEY))}catch{return null}};
+    const saveProfile=p=>localStorage.setItem(STORAGE_KEY,JSON.stringify(p));
+    const clearProfile=()=>localStorage.removeItem(STORAGE_KEY);
+
+    // Routing
+    function showPage(p){
+      [homePage,signPage,detailsPage,profilePage].forEach(el=>el.classList.remove('active'));
+      [navHome,navProfile,navSign].forEach(n=>n.classList.remove('active'));
+      if(p==='home'){homePage.classList.add('active');navHome.classList.add('active');}
+      if(p==='sign'){signPage.classList.add('active');navSign.classList.add('active');}
+      if(p==='details'){detailsPage.classList.add('active');}
+      if(p==='profile'){profilePage.classList.add('active');navProfile.classList.add('active');}
+    }
+    navHome.onclick=e=>{e.preventDefault();showPage('home');};
+    navProfile.onclick=e=>{e.preventDefault();showPage('profile');renderProfile();};
+    navSign.onclick=e=>{e.preventDefault();showPage('sign');};
+
+    // Rendering
+    const escapeHtml=str=>String(str||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    function createCard(r){
+      const el=document.createElement('div'); el.className='card';
+      el.innerHTML=`<img src="${r.image}" alt="${escapeHtml(r.title)}"/>
+        <h4>${escapeHtml(r.title)}</h4>
+        <div class="chips">${(r.dishTypes||[]).slice(0,3).map(t=>`<span class="chip">${escapeHtml(t)}</span>`).join('')}</div>
+        <div class="meta"><div>${r.usedIngredients?r.usedIngredients.map(i=>i.name).slice(0,3).join(', '):''}</div>
+        <button data-id="${r.id}" class="small-btn ghost viewBtn">View</button></div>`;
+      return el;
+    }
+    function renderRecommended(list){recommendedGrid.innerHTML='';list.forEach(r=>recommendedGrid.appendChild(createCard(r)));}
+    function renderResults(list){resultGrid.innerHTML='';if(!list.length){resultGrid.innerHTML='<div class="panel">No recipes found.</div>';return;}list.forEach(r=>resultGrid.appendChild(createCard(r)));}
+
+    // API calls
+    async function fetchRecommended(){try{const res=await fetch(`${API_BASE}/random?apiKey=${API_KEY}&number=6`);const data=await res.json();renderRecommended(data.recipes||[]);}catch{recommendedGrid.innerHTML='<div class="panel">Error loading recommended</div>';}}
+    async function searchRecipes(q){if(!q.trim())return renderResults([]);try{const res=await fetch(`${API_BASE}/findByIngredients?apiKey=${API_KEY}&ingredients=${encodeURIComponent(q)}&number=8`);const data=await res.json();renderResults(data||[]);}catch{resultGrid.innerHTML='<div class="panel">Error searching</div>';}}
+    async function showRecipeDetails(id){try{const res=await fetch(`${API_BASE}/${id}/information?apiKey=${API_KEY}`);const r=await res.json();detailsImage.src=r.image;detailsTitle.textContent=r.title;detailsIngredients.innerHTML=(r.extendedIngredients||[]).map(i=>`<li>${escapeHtml(i.original)}</li>`).join('');detailsInstructions.innerHTML=r.instructions||'No instructions';detailTags.innerHTML=(r.dishTypes||[]).map(t=>`<span class="chip">${escapeHtml(t)}</span>`).join(' ');showPage('details');}catch{alert('Error loading details');}}
+
+    // Search handlers
+    searchBtn.onclick=()=>searchRecipes(searchInput.value);
+    clearBtn.onclick=()=>{searchInput.value='';renderResults([]);};
+    searchInput.onkeydown=e=>{if(e.key==='Enter')searchBtn.click();};
+    backToHome.onclick=()=>showPage('home');
+
+    document.addEventListener('click',e=>{
+      if(e.target.classList.contains('viewBtn'))showRecipeDetails(e.target.dataset.id);
+      const card=e.target.closest('.card');if(card&&e.target.tagName!=='BUTTON'){const btn=card.querySelector('.viewBtn');if(btn)btn.click();}
+    });
+
+    // Profile
+    function gradientFromString(s){let h=0;for(let i=0;i<s.length;i++)h=(h<<5)-h+s.charCodeAt(i);const a=Math.abs(h)%360;const b=(a+60)%360;return `linear-gradient(135deg,hsl(${a} 60% 30%),hsl(${b} 55% 25%))`;}
+    function renderProfile(){const p=loadProfile();if(!p){profileName.textContent='Guest';profileEmail.textContent='Not signed in';profileAvatar.textContent='G';}else{profileName.textContent=p.name||'Unnamed';profileEmail.textContent=p.email||'';const initials=(p.name||'U').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();profileAvatar.textContent=initials;profileAvatar.style.background=gradientFromString(p.name||'U');}}
+    editProfileBtn.onclick=()=>{const p=loadProfile();profileNameInput.value=p?.name||'';profileEmailInput.value=p?.email||'';editProfilePanel.style.display='block';};
+    cancelEditBtn.onclick=()=>editProfilePanel.style.display='none';
+    saveProfileBtn.onclick=()=>{const n=profileNameInput.value.trim();if(!n)return alert('Enter a name');const e=profileEmailInput.value.trim();saveProfile({name:n,email:e});renderProfile();welcomeText.textContent=`Hello, ${n.split(' ')[0]}`;editProfilePanel.style.display='none';};
+    btnSignOut.onclick=()=>{clearProfile();renderProfile();welcomeText.textContent='Hello, Guest';showPage('sign');};
+
+    // Sign in
+    btnSignIn.onclick=()=>{const n=signinName.value.trim();if(!n)return alert('Enter a name');const e=signinEmail.value.trim();saveProfile({name:n,email:e});welcomeText.textContent=`Hello, ${n.split(' ')[0]}`;renderProfile();signinName.value='';signinEmail.value='';showPage('home');};
+    btnGuest.onclick=()=>{welcomeText.textContent='Hello, Guest';showPage('home');};
+    btnViewSample.onclick=()=>showPage('home');
+
+    // Boot
+    function boot(){fetchRecommended();renderResults([]);const p=loadProfile();if(p){welcomeText.textContent=`Hello, ${p.name.split(' ')[0]}`;renderProfile();showPage('home');}else showPage('sign');}
+    boot();
+  </script>
 </body>
 </html>
+
